@@ -13,12 +13,19 @@ io.on('connection', socket => {
   meetupTop10([])
 });
 
-
 mup.stream("/2/rsvps", stream => {
   stream
     .on("data", item => {
       const topicNames = item.group.group_topics.map(topic => topic.topic_name)
+
+      const containSofware = topicNames.filter((topic_name) => {
+        return topic_name === 'Software Development'
+      })
+
+      if(containSofware.length > 0)
+      {
       meetupTop10(topicNames)
+      }
 
     }).on("error", e => {
        console.log("error! " + e)
@@ -28,12 +35,7 @@ mup.stream("/2/rsvps", stream => {
 function meetupTop10(topicNames) {
 
 
-  const containSofware = topicNames.filter((topic_name) => {
-    return topic_name === 'Software Development'
-  })
 
-  if(containSofware.length > 0)
-  {
     topicNames.forEach(name => {
       if (topicsCounter[name]) {
         topicsCounter[name]++
@@ -42,7 +44,7 @@ function meetupTop10(topicNames) {
         topicsCounter[name] = 1
       }
     })
-  }
+  
   //console.log(topicsCounter)
   const arrayOfTopics = Object.keys(topicsCounter)
   arrayOfTopics.sort((topicA, topicB) => {
