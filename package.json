@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "meetup": "^0.1.0-SNAPSHOT",
+    "socket.io": "^2.0.4"
+  }
+}
