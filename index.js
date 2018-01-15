@@ -7,11 +7,13 @@ var io = require('socket.io')(server)
 server.listen(3002)
 
 let topicsCounter = {}
-
+let rsvpItem = {}
+let arrayRsvp = []
 io.on('connection', socket => {
   console.log('got connection')
   meetupTop10([])
 });
+
 
 mup.stream("/2/rsvps", stream => {
   stream
@@ -21,6 +23,16 @@ mup.stream("/2/rsvps", stream => {
       if(topicNames.indexOf('Software Development') < 0)
       {
         return
+      }
+
+      if(arrayRsvp.some(rsvp => rsvp.rsvp_id === item.rsvp_id))
+			{
+				arrayRsvp
+			}
+      else
+      {
+        arrayRsvp.push(item.rsvp_id)
+        rsvpItem = item
       }
       meetupTop10(topicNames)
 
@@ -59,6 +71,18 @@ function meetupTop10(topicNames) {
     return { topic: topic, count: topicsCounter[topic] }
   })
   const top10 = mapedTopics.slice(0,10)
-  io.emit('action', top10)
+
+  const action = {
+    type: 'UPDATE_TOPICS',
+    payload: top10
+  }
+
+  const acitonRsvps = {
+    type: 'ADD_RSVP',
+    payload: rsvpItem
+  }
+
+  io.emit('action', action)
+  io.emit('add_rsvps', acitonRsvps)
   console.log(top10)
 }
